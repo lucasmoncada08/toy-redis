@@ -6,7 +6,9 @@ def main():
 
     with socket.socket() as s:
       s.connect(("localhost", 6379))
-      s.sendall(b"hello world")
+      # s.sendall(b"PING")
+      # s.sendall(b"*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n")
+      s.sendall(b"*********")
       data = s.recv(1024)
     
     print(f'data recieved: {repr(data)}')
