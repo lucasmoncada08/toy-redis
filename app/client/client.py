@@ -8,7 +8,7 @@ def main():
       s.connect(("localhost", 6379))
       # s.sendall(b"PING")
       # s.sendall(b"*2\r\n$4\r\nECHO\r\n$3\r\nhey\r\n")
-      s.sendall(b"*********")
+      s.sendall(b"+ping\r\n")
       data = s.recv(1024)
     
     print(f'data recieved: {repr(data)}')

@@ -17,7 +17,7 @@ def handle_connection(client_connection):
       # if len(data) < 1:
       #   break
 
-      command = RESPDecoder(client_connection).decode()
+      command = RESPDecoder(client_connection).decode().lower()
 
       if command == b"ping":
         client_connection.send(b"+PONG\r\n")
