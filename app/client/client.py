@@ -6,7 +6,10 @@ def main():
 
     with socket.socket() as s:
       s.connect(("localhost", 6379))
-      s.sendall(b"*2\r\n$4\r\nECHO\r\n$6\r\napples\r\n")
+      # s.sendall(b"*3\r\n$3\r\nSET\r\n$4\r\nname\r\n$5\r\nlucas\r\n")
+      # s.sendall(b"*3\r\n$3\r\nSET\r\n$5\r\nlucas\r\n$7\r\nmoncada\r\n")
+      s.sendall(b"*2\r\n$3\r\nGET\r\n$4\r\nnaml\r\n")
+
       # s.sendall(b"+PING\r\n")
       data = s.recv(1024)
     
