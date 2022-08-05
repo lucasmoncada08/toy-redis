@@ -1,6 +1,7 @@
 from socket import create_server
 from threading import Thread
 from resp_decoder import RESPDecoder
+from time import time
 
 def main():
   print("In main logging")
@@ -8,7 +9,6 @@ def main():
   server_socket = create_server(("localhost", 6379), reuse_port=True)
 
   store = {}
-  print('reset store')
   
   while True:
     
@@ -21,6 +21,8 @@ def handle_connection(client_connection, store):
     try:
 
       decoded = RESPDecoder(client_connection).decode()
+
+      print(decoded)
 
       if decoded is None:
         break
@@ -36,22 +38,24 @@ def handle_connection(client_connection, store):
       elif command == b"echo":
         client_connection.send(f"${len(args[0])}\r\n{args[0].decode('utf-8')}\r\n".encode())
       elif command == b"set":
-        store[args[0]] = args[1]
+        if len(args) == 2:
+          store[args[0]] = (args[1], -1)
+        elif len(args) == 4:
+          store[args[0]] = (args[1], time()+(int(args[3])/1000))
         client_connection.send(b"+OK\r\n")
       elif command == b"get":
-        # print(args[0])
-        # print(store)
-        # print(store[b'name'])
         if args[0] not in store:
-          client_connection.send(b"-Invalid Key\r\n")
+          client_connection.send(b"$-1\r\n")
+        elif store[args[0]][1] != -1 and store[args[0]][1] < time():
+          store.pop(args[0])
+          client_connection.send(b"$-1\r\n")
         else:
-          value = store[args[0]]
+          value = store[args[0]][0]
           client_connection.send(f"${len(value)}\r\n{value.decode('utf-8')}\r\n".encode())
       else:
         client_connection.send(b"-ERR unknown command\r\n")
-      
-      print(f'store: {store}')
-      # print(f'store[b"name"]: {store[b"name"]}')
+
+      print(store)
 
     except ConnectionError:
       break
