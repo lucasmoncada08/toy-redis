@@ -10,27 +10,34 @@ def main():
   while True:
     client_connection, _ = server_socket.accept() # wait for client
     Thread(target=handle_connection, args=(client_connection,)).start()
+    # handle_connection(client_connection)
   
 def handle_connection(client_connection):
   while True:
     try:
-      # if len(data) < 1:
-      #   break
 
-      command = RESPDecoder(client_connection).decode().lower()
+      decoded = RESPDecoder(client_connection).decode()
+
+      # print(f'decoded: {decoded}')
+
+      if decoded is None:
+        break
+
+      if isinstance(decoded, bytes):
+        command = decoded.lower()
+      else:
+        command = decoded[0].lower()
+        args = decoded[1:]
 
       if command == b"ping":
         client_connection.send(b"+PONG\r\n")
       elif command == b"echo":
-        client_connection.send(b"+ECHO\r\n")
+        client_connection.send(f"${len(args[0])}\r\n{args[0].decode('utf-8')}\r\n".encode())
       else:
         client_connection.send(b"-ERR unknown command\r\n")
 
     except ConnectionError:
       break
-  
-def handle_array(data):
-  return b"+Array\r\n"
 
 if __name__ == "__main__":
   main()
