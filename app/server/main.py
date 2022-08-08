@@ -55,8 +55,6 @@ def handle_connection(client_connection, store):
       else:
         client_connection.send(b"-ERR unknown command\r\n")
 
-      print(store)
-
     except ConnectionError:
       break
 
