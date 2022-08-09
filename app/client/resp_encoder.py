@@ -4,6 +4,8 @@ class RESPEncoder:
 
         text_split = text.split(' ')
 
+        # print(f'text_split: {text_split}')
+
         if len(text_split) == 0 or text_split[0] == "":
             return b"+Invalid\r\n"
 
@@ -15,7 +17,6 @@ class RESPEncoder:
             encoded_str += self.encode_bulk_string(txt)
         return encoded_str.encode()
 
-    # method used to 
     def encode_bulk_string(self, text: str) -> str:
         return f"${len(text)}\r\n{text}\r\n"
 

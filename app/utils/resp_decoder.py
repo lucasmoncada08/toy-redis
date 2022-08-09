@@ -45,7 +45,6 @@ class ConnectionBuffer:
   def read(self, buff_size):
     if len(self.buffer) < buff_size:
       data = self.connection.recv(1024)
-
       if not data:
         return None
       

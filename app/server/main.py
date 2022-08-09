@@ -1,20 +1,26 @@
 from socket import create_server
 from threading import Thread
-from resp_decoder import RESPDecoder
+# from resp_decoder import RESPDecoder
 from time import time
 import logging
+import sys
+import os
+
+# getting cwd to use when running client as a module
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+if os.path.dirname(SCRIPT_DIR) not in sys.path:
+  sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+from utils.resp_decoder import RESPDecoder
 
 def main():
   logging.basicConfig(level = logging.INFO)
-
   logging.info("Starting Server")
 
   server_socket = create_server(("localhost", 6379), reuse_port=True)
-
   logging.info("Server Started")
 
-  store = {}
-  
+  store = {}  
   while True:
     
     client_connection, _ = server_socket.accept() # wait for client
@@ -49,15 +55,24 @@ def handle_connection(client_connection, store):
         client_connection.send(b"+OK\r\n")
       elif command == b"get":
         if args[0] not in store:
-          client_connection.send(b"$-1\r\n")
+          client_connection.send(b"+-1\r\n")
         elif store[args[0]][1] != -1 and store[args[0]][1] < time():
           store.pop(args[0])
-          client_connection.send(b"$-1\r\n")
+          client_connection.send(b"+-1\r\n")
         else:
           value = store[args[0]][0]
           client_connection.send(f"${len(value)}\r\n{value.decode('utf-8')}\r\n".encode())
+      elif command == b"expire":
+        if args[0] not in store:
+          client_connection.send(b"+0\r\n")
+        elif store[args[0]][1] != -1 and store[args[0]][1] < time():
+          store.pop(args[0])
+          client_connection.send(b"+0\r\n")
+        else:
+          store[args[0]] = (store[args[0]][0], time()+(int(args[1])/1000))
+          client_connection.send(b"+1\r\n")
       else:
-        client_connection.send(b"-ERR unknown command\r\n")
+        client_connection.send(b"+-ERR unknown command\r\n")
 
     except ConnectionError:
       break
