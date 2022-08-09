@@ -35,9 +35,9 @@ SET <key> <value> [EX|PX <time>]
 ```
 
 ### Expire
-Set an expiry time on a key in currently in the data store. Default unit is EX.
+Set an expiry time on a key in currently in the data store. Default unit is PX.
 ```
-EXPIRE <key> [EX|PX]
+EXPIRE <key> [EX|PX] <time>
 ```
 
 ## Run Tests

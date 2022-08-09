@@ -1,6 +1,5 @@
 from socket import create_server
 from threading import Thread, Timer
-# from resp_decoder import RESPDecoder
 from time import time
 import logging
 import sys
@@ -29,8 +28,7 @@ def main():
     Thread(target=handle_connection, args=(client_connection, store,)).start()
 
 def run_timer(store):
-  Timer(25.0, run_timer, [store]).start()
-  print(f"Ran Timer: {store}")
+  Timer(10.0, run_timer, [store]).start()
   active_key_expire(store)
 
 def active_key_expire(store):
@@ -65,15 +63,33 @@ def handle_connection(client_connection, store):
 
       if command == b"ping":
         client_connection.send(b"+PONG\r\n")
+
       elif command == b"echo":
         client_connection.send(f"${len(args[0])}\r\n{args[0].decode('utf-8')}\r\n".encode())
+
       elif command == b"set":
+        if len(args) < 2 or len(args) > 4:
+          client_connection.send(b"+-ERR invalid number of args\r\n")
+          continue
+
         if len(args) == 2:
           store[args[0]] = (args[1], -1)
-        elif len(args) == 4:
-          store[args[0]] = (args[1], time()+(int(args[3])/1000))
+        elif len(args) == 3:
+          store[args[0]] = (args[1], time()+(int(args[2])/1000))
+        else:
+          if args[2].lower() == b"px":
+            store[args[0]] = (args[1], time()+(int(args[3])/1000))
+          elif args[2].lower() == b"ex":
+            store[args[0]] = (args[1], time()+int(args[3]))
+          else:
+            client_connection.send(b"+-ERR invalid unit\r\n")
         client_connection.send(b"+OK\r\n")
+
       elif command == b"get":
+        if len(args) != 1:
+          client_connection.send(b"+-ERR invalid number of args\r\n")
+          continue
+
         if args[0] not in store:
           client_connection.send(b"+-1\r\n")
         elif store[args[0]][1] != -1 and store[args[0]][1] < time():
@@ -82,15 +98,29 @@ def handle_connection(client_connection, store):
         else:
           value = store[args[0]][0]
           client_connection.send(f"${len(value)}\r\n{value.decode('utf-8')}\r\n".encode())
+
       elif command == b"expire":
+        if len(args) < 2 or len(args) > 3:
+          client_connection.send(b"+-ERR invalid number of args\r\n")
+          continue
+
         if args[0] not in store:
           client_connection.send(b"+0\r\n")
         elif store[args[0]][1] != -1 and store[args[0]][1] < time():
           store.pop(args[0])
           client_connection.send(b"+0\r\n")
-        else:
+        elif len(args) == 2:
           store[args[0]] = (store[args[0]][0], time()+(int(args[1])/1000))
           client_connection.send(b"+1\r\n")
+        elif len(args) == 3:
+          if args[1].lower() == b"px":
+            store[args[0]] = (store[args[0]][0], time()+(int(args[2])/1000))
+          elif args[1].lower() == b"ex":
+            store[args[0]] = (store[args[0]][0], time()+int(args[2]))
+          else:
+            client_connection.send(b"+-ERR invalid unit\r\n")
+          client_connection.send(b"+1\r\n")
+          
       else:
         client_connection.send(b"+-ERR unknown command\r\n")
 
