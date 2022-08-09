@@ -29,10 +29,23 @@ def main():
     Thread(target=handle_connection, args=(client_connection, store,)).start()
 
 def run_timer(store):
-  Timer(10.0, run_timer, [store]).start()
+  Timer(25.0, run_timer, [store]).start()
   print(f"Ran Timer: {store}")
+  active_key_expire(store)
 
+def active_key_expire(store):
+  sample_size = min(len(store), 10)
 
+  expired = 0 # keeping track of number of expired keys
+  for key in list(store.keys())[:sample_size]:
+    # double check key in store, account for no expiry, check if expired
+    if key in store and store[key][1] > 0 and store[key][1] < time():
+      store.pop(key, None)
+      expired += 1
+  
+  # if 25% of keys were expired, run the active key expire again
+  if expired > sample_size*0.25:
+    active_key_expire(store)
 
 def handle_connection(client_connection, store):
 
