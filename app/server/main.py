@@ -1,5 +1,5 @@
 from socket import create_server
-from threading import Thread
+from threading import Thread, Timer
 # from resp_decoder import RESPDecoder
 from time import time
 import logging
@@ -20,13 +20,20 @@ def main():
   server_socket = create_server(("localhost", 6379), reuse_port=True)
   logging.info("Server Started")
 
-  store = {}  
+  store = {}
+  run_timer(store)
   while True:
     
     client_connection, _ = server_socket.accept() # wait for client
     logging.info("Client Connected")
     Thread(target=handle_connection, args=(client_connection, store,)).start()
-  
+
+def run_timer(store):
+  Timer(10.0, run_timer, [store]).start()
+  print(f"Ran Timer: {store}")
+
+
+
 def handle_connection(client_connection, store):
 
   while True:
