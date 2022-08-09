@@ -1,29 +1,30 @@
-# toy-redis
-Basic Version of Redis implementing core features
+# Redis in Python
+Basic version of Redis implementing core features such as get, set, and expire.
 
 ## How to Use
 
-1. Run Server in command line -> Add command
-2. Run Client(s) in command line -> Add command
-3. Input commands into client command line
+1. Create two command line terminals in the main project directory (/toy-redis)
+1. Run Server in a command line -> ```python -m app.client.client```
+2. Run Client(s) in another command line -> ```python app/server/main.py```
+3. Input commands into client command line (see below)
 
 ## Features
-See below the features included in this implementation of Redis
+See below the features included in this implementation of Redis.
 
 ### Ping
-Ping the server to check if responsive
+Ping the server to check if it is responsive.
 ```
 PING
 ```
 
 ### Echo
-Get response from the server
+Get response from the server.
 ```
 ECHO <value>
 ```
 
 ### Get
-Get the value corresponding to the key in the data store
+Get the value corresponding to the key in the data store.
 ```
 GET <key>
 ```
@@ -41,6 +42,18 @@ EXPIRE <key> [EX|PX] <time>
 ```
 
 ## Run Tests
-Below are the commands to run the tests to verify the code is functioning properly
+Below are the commands to run the tests to verify the code is functioning properly. 
+
+### RESP Encoder Test
+To ensure the Redis Protocol (RESP) encoding is still working according to plan.
+```
+python -m unittest -v tests.test_resp_encoder
+```
+
+### App Test
+Intergration testing the entire app by testing all the commands in an end-to-end style.
+```
+python -m unittest -v tests.test_app
+```
 
 Insert commands here

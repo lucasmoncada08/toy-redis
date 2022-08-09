@@ -23,14 +23,11 @@ def run_client(test: str=None):
   with socket.socket() as s:
     s.connect(("localhost", 6379))
     print("<  Client Connected\n")
-    # s.sendall(b"*3\r\n$3\r\nSET\r\n$4\r\nname\r\n$5\r\nlucas\r\n")
-    # s.sendall(b"*3\r\n$3\r\nSET\r\n$5\r\nlucas\r\n$7\r\nmoncada\r\n")
-    # s.sendall(b"*2\r\n$3\r\nGET\r\n$4\r\nname\r\n")
-    # s.sendall(b"*2\r\n$3\r\nGET\r\n$5\r\nlucas\r\n")
 
-    # s.sendall(b"*4\r\n$3\r\nSET\r\n$5\r\nlucas\r\n$7\r\nmoncada\r\n$2\r\n10\r\n")
     data = None
     test_flag = False # to check if the test has been run
+
+    # run until exit is input
     while True:
       
       # if tests are provided, use them, else get user input
@@ -40,7 +37,7 @@ def run_client(test: str=None):
         inp = test
         test_flag = True
       else:
-        inp = input(">  ")
+        inp = input(">  ") # client waits for user input
 
       if inp == "exit":
         print("<  Exiting")
@@ -52,9 +49,7 @@ def run_client(test: str=None):
 
       enc_inp = re_encode.encode(inp)
 
-      # print(f'enc_inp: {enc_inp}')
-
-      s.sendall(enc_inp)
+      s.sendall(enc_inp) # send encoded input back to server
       
       # first decode is custom decode and second if from bytes to string
       data = RESPDecoder(s).decode().decode("utf-8")

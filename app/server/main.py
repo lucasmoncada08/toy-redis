@@ -57,6 +57,7 @@ def handle_connection(client_connection, store):
 
       if isinstance(decoded, bytes):
         command = decoded.lower()
+        args = None
       else:
         command = decoded[0].lower()
         args = decoded[1:]
@@ -66,6 +67,9 @@ def handle_connection(client_connection, store):
 
       elif command == b"echo":
         client_connection.send(f"${len(args[0])}\r\n{args[0].decode('utf-8')}\r\n".encode())
+
+      elif not args:
+        client_connection.send(b"+-ERR invalid number of args\r\n")
 
       elif command == b"set":
         if len(args) < 2 or len(args) > 4:
@@ -119,6 +123,7 @@ def handle_connection(client_connection, store):
             store[args[0]] = (store[args[0]][0], time()+int(args[2]))
           else:
             client_connection.send(b"+-ERR invalid unit\r\n")
+            continue
           client_connection.send(b"+1\r\n")
           
       else:
