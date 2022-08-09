@@ -2,17 +2,23 @@ from socket import create_server
 from threading import Thread
 from resp_decoder import RESPDecoder
 from time import time
+import logging
 
 def main():
-  print("In main logging")
+  logging.basicConfig(level = logging.INFO)
+
+  logging.info("Starting Server")
 
   server_socket = create_server(("localhost", 6379), reuse_port=True)
+
+  logging.info("Server Started")
 
   store = {}
   
   while True:
     
     client_connection, _ = server_socket.accept() # wait for client
+    logging.info("Client Connected")
     Thread(target=handle_connection, args=(client_connection, store,)).start()
   
 def handle_connection(client_connection, store):
@@ -21,8 +27,6 @@ def handle_connection(client_connection, store):
     try:
 
       decoded = RESPDecoder(client_connection).decode()
-
-      print(decoded)
 
       if decoded is None:
         break
