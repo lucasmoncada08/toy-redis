@@ -1,7 +1,7 @@
-from importlib.resources import path
 import unittest
 
 from app.client import run_client
+# from app.client.resp_encoder import encode
 
 class TestClient(unittest.TestCase):
   def test_handle_client(self):
