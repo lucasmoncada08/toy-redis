@@ -1,6 +1,9 @@
 # Redis in Python
 Basic version of Redis implementing core features such as get, set, and expire.
 
+See my medium article on my process here: *Add*
+See my demo video here: *Add*
+
 ## How to Use
 
 1. Create two command line terminals in the main project directory (/toy-redis)
@@ -56,4 +59,4 @@ Intergration testing the entire app by testing all the commands in an end-to-end
 python -m unittest -v tests.test_app
 ```
 
-Insert commands here
+

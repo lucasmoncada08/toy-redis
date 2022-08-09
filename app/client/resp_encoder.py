@@ -1,10 +1,8 @@
-
+# Encoding functionality from regular text to RESP format
 class RESPEncoder:
     def encode(self, text: str) -> bytes:
 
         text_split = text.split(' ')
-
-        # print(f'text_split: {text_split}')
 
         if len(text_split) == 0 or text_split[0] == "":
             return b"+Invalid\r\n"
@@ -12,6 +10,7 @@ class RESPEncoder:
         if len(text_split) == 1:
             return f"+{text}\r\n".encode()
 
+        # if the input had multiple seperate words (commands)
         encoded_str = f"*{len(text_split)}\r\n"
         for txt in text_split:
             encoded_str += self.encode_bulk_string(txt)

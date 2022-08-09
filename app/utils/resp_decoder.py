@@ -1,3 +1,4 @@
+# functionality for decoding the buffer inputs
 class RESPDecoder:
   def __init__(self, connection):
     self.connection = ConnectionBuffer(connection)
@@ -37,6 +38,7 @@ class RESPDecoder:
     
     return result
 
+# Functionality to connect and read from buffer
 class ConnectionBuffer:
   def __init__(self, connection):
     self.connection = connection

@@ -12,6 +12,7 @@ if os.path.dirname(SCRIPT_DIR) not in sys.path:
 
 from utils.resp_decoder import RESPDecoder
 
+
 def main():
   logging.basicConfig(level = logging.INFO)
   logging.info("Starting Server")
@@ -19,14 +20,15 @@ def main():
   server_socket = create_server(("localhost", 6379), reuse_port=True)
   logging.info("Server Started")
 
-  store = {}
+  store = {} # storage of all the keys
   run_timer(store)
-  while True:
-    
+
+  while True:  
     client_connection, _ = server_socket.accept() # wait for client
     logging.info("Client Connected")
-    Thread(target=handle_connection, args=(client_connection, store,)).start()
+    Thread(target=handle_connection, args=(client_connection, store,)).start() # open a thread for each client connection
 
+# timer used for active expiring of stored keys
 def run_timer(store):
   Timer(10.0, run_timer, [store]).start()
   active_key_expire(store)
@@ -45,17 +47,22 @@ def active_key_expire(store):
   if expired > sample_size*0.25:
     active_key_expire(store)
 
-def handle_connection(client_connection, store):
 
+def handle_connection(client_connection, store):
+  """
+  Main function used for handling all the connections. Includes while loop to handle all client inputs.
+
+  Consider modifying the below code for a more readable and modular structure for handling different commands.
+  """
   while True:
     try:
 
-      decoded = RESPDecoder(client_connection).decode()
+      decoded = RESPDecoder(client_connection).decode() # run essential fxn to decode RESP to readable byte strings
 
       if decoded is None:
         break
-
-      if isinstance(decoded, bytes):
+      
+      if isinstance(decoded, bytes): # just one input
         command = decoded.lower()
         args = None
       else:
