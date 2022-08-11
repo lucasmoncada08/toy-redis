@@ -45,6 +45,7 @@ class ConnectionBuffer:
     self.buffer = b""
   
   def read(self, buff_size):
+    # if req buff size has not already been read in
     if len(self.buffer) < buff_size:
       data = self.connection.recv(1024)
       if not data:
@@ -56,6 +57,7 @@ class ConnectionBuffer:
     return data
 
   def read_until_delimeter(self, delimeter):
+    # if buffer does not have delim, more data must be read
     while delimeter not in self.buffer:
       data = self.connection.recv(1024)
 

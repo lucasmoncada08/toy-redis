@@ -22,7 +22,7 @@ def run_client(test: str=None):
 
   with socket.socket() as s:
     s.connect(("localhost", 6379))
-    print("<  Client Connected\n")
+    print("<  Connected to Server\n")
 
     data = None
     test_flag = False # to check if the test has been run
@@ -51,7 +51,7 @@ def run_client(test: str=None):
 
       s.sendall(enc_inp) # send encoded input back to server
       
-      # first decode is custom decode and second if from bytes to string
+      # wait until data received – first decode is custom decode and second is from bytes to string
       data = RESPDecoder(s).decode().decode("utf-8")
 
       print(f'<  {data}\n')

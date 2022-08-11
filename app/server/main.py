@@ -23,7 +23,7 @@ def main():
   store = {} # storage of all the keys
   run_timer(store)
 
-  while True:  
+  while True:
     client_connection, _ = server_socket.accept() # wait for client
     logging.info("Client Connected")
     Thread(target=handle_connection, args=(client_connection, store,)).start() # open a thread for each client connection
