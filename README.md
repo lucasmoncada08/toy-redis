@@ -54,7 +54,7 @@ python -m unittest -v tests.test_resp_encoder
 ```
 
 ### App Test
-Intergration testing the entire app by testing all the commands in an end-to-end style.
+Intergration testing the entire app by testing all the commands in an end-to-end style. Note that the server must be running in a separate command line first.
 ```
 python -m unittest -v tests.test_app
 ```

@@ -21,31 +21,37 @@ def main():
   logging.info("Server Started")
 
   store = {} # storage of all the keys
-  run_timer(store)
+
+  ActiveKeyExpire(store).run_timer()
 
   while True:
     client_connection, _ = server_socket.accept() # wait for client
     logging.info("Client Connected")
     Thread(target=handle_connection, args=(client_connection, store,)).start() # open a thread for each client connection
 
-# timer used for active expiring of stored keys
-def run_timer(store):
-  Timer(10.0, run_timer, [store]).start()
-  active_key_expire(store)
-
-def active_key_expire(store):
-  sample_size = min(len(store), 10)
-
-  expired = 0 # keeping track of number of expired keys
-  for key in list(store.keys())[:sample_size]:
-    # double check key in store, account for no expiry, check if expired
-    if key in store and store[key][1] > 0 and store[key][1] < time():
-      store.pop(key, None)
-      expired += 1
+class ActiveKeyExpire:
+  """Use thread timer to actively search for expired keys"""
+  def __init__(self, store):
+    self.store = store
   
-  # if 25% of keys were expired, run the active key expire again
-  if expired > sample_size*0.25:
-    active_key_expire(store)
+  # timer used for active expiring of stored keys
+  def run_timer(self):
+    Timer(10.0, self.run_timer, [self.store]).start()
+    self.active_key_expire()
+
+  def active_key_expire(self):
+    sample_size = min(len(self.store), 10)
+
+    expired = 0 # keeping track of number of expired keys
+    for key in list(self.store.keys())[:sample_size]:
+      # double check key in store, account for no expiry, check if expired
+      if key in self.store and self.store[key][1] > 0 and self.store[key][1] < time():
+        self.store.pop(key, None)
+        expired += 1
+  
+    # if 25% of keys were expired, run the active key expire again
+    if expired > sample_size*0.25:
+      self.active_key_expire()
 
 
 def handle_connection(client_connection, store):
