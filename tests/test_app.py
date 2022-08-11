@@ -19,7 +19,7 @@ class TestApp(unittest.TestCase):
         ("get friend", "john"),
     )
 
-    # test set without expire
+    # test invalid commands
     invalid_commands = (
         ("set friend", "-ERR invalid number of args"),
         ("get friend john", "-ERR invalid number of args"),
@@ -29,6 +29,7 @@ class TestApp(unittest.TestCase):
         
         ("set name friend", "OK"),
         ("expire name bx 1", "-ERR invalid unit"),
+        ("set name friend", "-ERR invalid unit"),
 
         ("name friend", "-ERR unknown command"),
         ("getset name friend", "-ERR unknown command"),

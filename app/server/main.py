@@ -41,7 +41,7 @@ class ActiveKeyExpire:
     self.active_key_expire()
 
   def active_key_expire(self):
-    sample_size = min(len(self.store), 10)
+    sample_size = min(len(self.store), 20)
 
     expired = 0 # keeping track of number of expired keys
     for key in list(self.store.keys())[:sample_size]:
@@ -55,7 +55,7 @@ class ActiveKeyExpire:
       self.active_key_expire()
 
 class Server:
-  
+
   def handle_connection(self, client_connection, store):
     """
     Main function used for handling all the connections. Includes while loop to handle all client inputs.
@@ -106,17 +106,20 @@ class Server:
       self.client_connection.send(b"+-ERR invalid number of args\r\n")
       return
 
-    if len(args) == 2:
+    if len(args) == 2: # no expiry
       self.store[args[0]] = (args[1], -1)
-    elif len(args) == 3:
+
+    elif len(args) == 3: # expiry with no units
       self.store[args[0]] = (args[1], time()+(int(args[2])/1000))
-    else:
+
+    else: # expiry with units
       if args[2].lower() == b"px":
         self.store[args[0]] = (args[1], time()+(int(args[3])/1000))
       elif args[2].lower() == b"ex":
         self.store[args[0]] = (args[1], time()+int(args[3]))
       else:
         self.client_connection.send(b"+-ERR invalid unit\r\n")
+        return
     self.client_connection.send(b"+OK\r\n")
 
   def handle_get_command(self, args):
