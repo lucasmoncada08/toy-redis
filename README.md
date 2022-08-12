@@ -2,6 +2,7 @@
 Basic version of Redis implementing core features such as get, set, and expire.
 
 See my medium article on my process here: https://medium.com/me/notifications
+
 See my demo video here: <Add>
 
 ## How to Use
