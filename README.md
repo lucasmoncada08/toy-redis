@@ -1,9 +1,9 @@
 # Redis in Python
 Basic version of Redis implementing core features such as get, set, and expire.
 
-See my medium article on my process here: https://medium.com/me/notifications
+See my medium article on my process here: https://medium.com/@lucas.moncada08/how-i-implemented-redis-in-python-4cf39e66e77a
 
-See my demo video here: <Add>
+See my demo video here: https://www.loom.com/share/eae4058f85f94e3bb781c9339026a359
 
 ## How to Use
 
